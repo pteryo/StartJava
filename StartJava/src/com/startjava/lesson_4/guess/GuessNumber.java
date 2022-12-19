@@ -8,6 +8,8 @@ public class GuessNumber {
     private Player player1;
     private Player player2;
     private Scanner scan;
+    static final int maxTurns = 10;
+    static final int maxRandom = 100;
 
     public GuessNumber(Player player1, Player player2, Scanner scan) {
         this.player1 = player1;
@@ -17,18 +19,30 @@ public class GuessNumber {
 
     public void start() {
         generateSecretNumber();
+        player1.clearGuesses();
+        player2.clearGuesses();
+        System.out.println("У каждого игрока по " + maxTurns + " попыток");
         do {
-            inputNumber(player1);
-            if (isGuessed(player1)) {
+            if ((player1.checkLimitReached(maxTurns)) && (player2.checkLimitReached(maxTurns))) {
                 break;
             }
-            inputNumber(player2);
-            if (isGuessed(player2)) {
+            if (doTurn(player1)) {
                 break;
+            }
+            if (player1.checkLimitReached(maxTurns)) {
+                System.out.println("У " + player1.getName() + " закончились попытки");
+            }
+            if (doTurn(player2)) {
+                break;
+            }
+            if (player2.checkLimitReached(maxTurns)) {
+                System.out.println("У " + player2.getName() + " закончились попытки");
             }
         } while (true);
+        printGuessLine(player1);
+        printGuessLine(player2);
     }
-    
+
     private void inputNumber(Player player) {
         System.out.print("Игрок " + player.getName() + ": ");
         player.setNumber(scan.nextInt());
@@ -37,12 +51,13 @@ public class GuessNumber {
 
     private void generateSecretNumber() {
         Random random = new Random();
-        secretNum = random.nextInt(100) + 1;
+        secretNum = random.nextInt(maxRandom) + 1;
     }
 
     public boolean isGuessed(Player player) {
         if (secretNum == player.getNumber()) {
-            System.out.println("Число = " + secretNum + ". Игрок " + player.getName() + " победил.");
+            System.out.println("Игрок " + player.getName() + " угадал число " + player.getNumber()
+                    + " с " + player.getCurrentGuessNum() + " попытки");
             return true;
         }
         if (player.getNumber() < secretNum) {
@@ -51,5 +66,19 @@ public class GuessNumber {
             System.out.println("Число " + player.getNumber() + " больше того, что загадал компьютер.");
         }
         return false;
+    }
+
+    private boolean doTurn(Player player) {
+        inputNumber(player);
+        return (isGuessed(player));
+    }
+    private void printGuessLine(Player player) {
+        int[] guess =  player.getGuessList();
+        System.out.print("Попытки " + player.getName() + ": ");
+        for (int i = 0; i < guess.length; i++) {
+            System.out.print(guess[i] + " ");
+        }
+        System.out.println();
+
     }
 }
