@@ -72,6 +72,7 @@ public class GuessNumber {
         inputNumber(player);
         return (isGuessed(player));
     }
+
     private void printGuessLine(Player player) {
         int[] guess =  player.getGuessList();
         System.out.print("Попытки " + player.getName() + ": ");
